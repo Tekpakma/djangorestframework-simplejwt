@@ -4,9 +4,9 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import AbstractBaseUser, update_last_login
 from django.utils.translation import gettext_lazy as _
-from rest_framework import exceptions, serializers
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-
+from .exceptions import AuthenticationFailed
 from .models import TokenUser
 from .settings import api_settings
 from .tokens import RefreshToken, SlidingToken, Token, UntypedToken
@@ -54,7 +54,7 @@ class TokenObtainSerializer(serializers.Serializer):
         self.user = authenticate(**authenticate_kwargs)
 
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
-            raise exceptions.AuthenticationFailed(
+            raise AuthenticationFailed(
                 self.error_messages["no_active_account"],
                 "no_active_account",
             )
